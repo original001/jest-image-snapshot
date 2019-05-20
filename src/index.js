@@ -36,6 +36,7 @@ function checkResult({
   retryTimes,
   snapshotIdentifier,
   chalk,
+  updateFailedSnapshot,
 }) {
   let pass = true;
   /*
@@ -48,9 +49,11 @@ function checkResult({
     // once transition away from jasmine is done this will be a lot more elegant and pure
     // https://github.com/facebook/jest/pull/3668
     updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
-  } else if (result.added) {
+  } 
+  
+  if (result.added) {
     updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
-  } else {
+  } else if (!result.updated || updateFailedSnapshot) {
     ({ pass } = result);
 
     updateSnapshotState(snapshotState, { matched: snapshotState.matched + 1 });
@@ -108,6 +111,7 @@ function configureToMatchImageSnapshot({
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
+  updateFailedSnapshot: commonupdateFailedSnapshot = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
@@ -119,6 +123,7 @@ function configureToMatchImageSnapshot({
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
     updatePassedSnapshot = commonUpdatePassedSnapshot,
+    updateFailedSnapshot = commonupdateFailedSnapshot,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -164,6 +169,7 @@ function configureToMatchImageSnapshot({
         failureThreshold,
         failureThresholdType,
         updatePassedSnapshot,
+        updateFailedSnapshot,
       });
 
     return checkResult({
@@ -172,6 +178,7 @@ function configureToMatchImageSnapshot({
       retryTimes,
       snapshotIdentifier,
       chalk,
+      updateFailedSnapshot,
     });
   };
 }

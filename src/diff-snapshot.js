@@ -95,6 +95,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
+    updateFailedSnapshot,
   } = options;
 
   let result = {};
@@ -197,6 +198,11 @@ function diffImageToSnapshot(options) {
       const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
       fs.writeFileSync(diffOutputPath, pngBuffer);
 
+      if (updateFailedSnapshot) {
+        mkdirp.sync(snapshotsDir);
+        fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+      }
+
       result = {
         pass: false,
         diffSize,
@@ -204,6 +210,7 @@ function diffImageToSnapshot(options) {
         diffOutputPath,
         diffRatio,
         diffPixelCount,
+        update: updateFailedSnapshot
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
       mkdirp.sync(snapshotsDir);
