@@ -230,25 +230,7 @@ function diffImageToSnapshot(options) {
 
 
 function runDiffImageToSnapshot(options) {
-  options.receivedImageBuffer = options.receivedImageBuffer.toString('base64');
-
-  const serializedInput = JSON.stringify(options);
-
-  let result = {};
-
-  const writeDiffProcess = childProcess.spawnSync(
-    process.execPath, [`${__dirname}/diff-process.js`],
-    { input: Buffer.from(serializedInput), stdio: ['pipe', 'inherit', 'inherit', 'pipe'] }
-  );
-
-  if (writeDiffProcess.status === 0) {
-    const output = writeDiffProcess.output[3].toString();
-    result = JSON.parse(output);
-  } else {
-    throw new Error('Error running image diff.');
-  }
-
-  return result;
+  return diffImageToSnapshot(options)
 }
 
 module.exports = {
